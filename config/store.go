@@ -267,7 +267,11 @@ func (s *Store) UpdateConfig(ctx context.Context, fn func(Config) (Config, error
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 	id, err := s.updateConfigTx(ctx, tx, fn)
 	if err != nil {
 		return err

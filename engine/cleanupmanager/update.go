@@ -35,7 +35,11 @@ func (db *DB) update(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 
 	_, err = tx.StmtContext(ctx, db.setTimeout).ExecContext(ctx)
 	if err != nil {

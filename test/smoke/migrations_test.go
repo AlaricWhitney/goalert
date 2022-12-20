@@ -414,12 +414,16 @@ func parsePGDump(data []byte, name string) []pgDumpEntry {
 		if strings.HasPrefix(line, "-- Name: ") {
 			entry.Name = strings.TrimSpace(strings.TrimPrefix(line, "-- Name: "))
 			entry.Body = ""
-			rd.ReadString('\n') // skip next line
+			if _, err := rd.ReadString('\n'); err != nil { // skip next line
+				break
+			}
 			continue
 		} else if strings.HasPrefix(line, "-- Data for Name: ") {
 			entry.Name = strings.TrimSpace(strings.TrimPrefix(line, "-- Data for Name: "))
 			entry.Body = ""
-			rd.ReadString('\n') // skip next line
+			if _, err := rd.ReadString('\n'); err != nil { // skip next line
+				break
+			}
 			continue
 		} else if strings.HasPrefix(line, "--") {
 			if entry.Name != "" {

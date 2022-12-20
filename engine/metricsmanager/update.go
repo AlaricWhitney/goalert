@@ -56,7 +56,11 @@ func (db *DB) UpdateAlertMetrics(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 
 	var alertIDs []int
 	var lastLogTime, boundNow time.Time

@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"sort"
 	"strconv"
 	"strings"
@@ -64,7 +65,10 @@ func splitRxTerms(rx string) pgtype.TextArray {
 	}
 
 	var t pgtype.TextArray
-	t.Set(terms)
+	if err := t.Set(terms); err != nil {
+		log.Println("ERROR:", err)
+		return pgtype.TextArray{} // setting to empty object in case there really bad data
+	}
 
 	return t
 }

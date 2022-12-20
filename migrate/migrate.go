@@ -404,7 +404,11 @@ func (step migrationStep) apply(ctx context.Context, c *pgx.Conn) error {
 	if err != nil {
 		return errors.Wrap(err, "begin tx")
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 
 	// tx applies to the connection, so NoTx
 	// will execute correctly.

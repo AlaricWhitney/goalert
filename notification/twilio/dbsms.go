@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/target/goalert/util"
+	"github.com/target/goalert/util/log"
 )
 
 type dbSMS struct {
@@ -90,7 +91,11 @@ func (db *dbSMS) insertDB(ctx context.Context, phoneNumber, callbackID string, a
 	if err != nil {
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 	_, err = tx.StmtContext(ctx, db.lock).ExecContext(ctx)
 	if err != nil {
 		return 0, err

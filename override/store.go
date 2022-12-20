@@ -9,6 +9,7 @@ import (
 	"github.com/target/goalert/assignment"
 	"github.com/target/goalert/permission"
 	"github.com/target/goalert/util"
+	"github.com/target/goalert/util/log"
 	"github.com/target/goalert/util/sqlutil"
 	"github.com/target/goalert/validation"
 	"github.com/target/goalert/validation/validate"
@@ -104,7 +105,11 @@ func (s *Store) withTx(ctx context.Context, tx *sql.Tx, fn func(tx *sql.Tx) erro
 		if err != nil {
 			return err
 		}
-		defer tx.Rollback()
+		defer func() {
+			if err := tx.Rollback(); err != nil {
+				log.Log(ctx, err)
+			}
+		}()
 		err = s.withTx(ctx, tx, fn)
 		if err != nil {
 			return err

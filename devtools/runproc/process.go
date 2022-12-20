@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -123,13 +124,19 @@ func (p *Process) Stop() {
 
 func (p *Process) gracefulTerm() {
 	if p.pty != nil {
-		io.WriteString(p.pty, "\x03")
+		if _, err := io.WriteString(p.pty, "\x03"); err != nil {
+			log.Println("ERROR:", err)
+		}
 		time.Sleep(100 * time.Millisecond)
-		io.WriteString(p.pty, "\x03")
+		if _, err := io.WriteString(p.pty, "\x03"); err != nil {
+			log.Println("ERROR:", err)
+		}
 		return
 	}
 
-	p.cmd.Process.Signal(os.Interrupt)
+	if err := p.cmd.Process.Signal(os.Interrupt); err != nil {
+		log.Println("ERROR:", err)
+	}
 }
 
 func (p *Process) Kill() {
@@ -141,7 +148,9 @@ func (p *Process) Kill() {
 	}
 
 	p.logAction("Killing...")
-	p.cmd.Process.Kill()
+	if err := p.cmd.Process.Kill(); err != nil {
+		log.Println("ERROR:", err)
+	}
 	p.state <- ProcessStateKilling
 
 	<-p.exited
@@ -164,7 +173,11 @@ func (p *Process) run() error {
 		p.cmd.Stdin = tty
 		err = p.cmd.Start()
 		if err == nil {
-			go io.Copy(p.p, p.pty)
+			go func() {
+				if _, err := io.Copy(p.p, p.pty); err != nil {
+					log.Println("ERROR:", err)
+				}
+			}()
 		} else {
 			p.pty.Close()
 		}

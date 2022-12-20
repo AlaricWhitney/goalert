@@ -10,6 +10,7 @@ import (
 	"github.com/target/goalert/permission"
 	"github.com/target/goalert/search"
 	"github.com/target/goalert/util"
+	"github.com/target/goalert/util/log"
 	"github.com/target/goalert/util/sqlutil"
 	"github.com/target/goalert/validation/validate"
 )
@@ -133,7 +134,11 @@ func (s *Store) MapToID(ctx context.Context, tx *sql.Tx, c *Channel) (uuid.UUID,
 		if err != nil {
 			return uuid.UUID{}, fmt.Errorf("start tx: %w", err)
 		}
-		defer tx.Rollback()
+		defer func() {
+			if err := tx.Rollback(); err != nil {
+				log.Log(ctx, err)
+			}
+		}()
 	}
 
 	_, err = tx.StmtContext(ctx, s.lock).ExecContext(ctx)

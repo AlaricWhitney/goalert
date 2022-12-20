@@ -3,7 +3,9 @@ package graphqlapp
 import (
 	context "context"
 	"database/sql"
+
 	"github.com/target/goalert/util/errutil"
+	"github.com/target/goalert/util/log"
 )
 
 // withContextTx is a helper function that handles starting and using a single transaction for a request.
@@ -32,7 +34,11 @@ func withContextTx(ctx context.Context, db *sql.DB, fn func(context.Context, *sq
 		if err != nil {
 			return err
 		}
-		defer tx.Rollback()
+		defer func() {
+			if err := tx.Rollback(); err != nil {
+				log.Log(ctx, err)
+			}
+		}()
 
 		err = fn(context.WithValue(ctx, txKey, tx), tx)
 		if err != nil {

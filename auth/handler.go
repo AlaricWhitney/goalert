@@ -276,7 +276,10 @@ func (h *Handler) ServeProviders(w http.ResponseWriter, req *http.Request) {
 	if errutil.HTTPError(req.Context(), w, err) {
 		return
 	}
-	w.Write(data)
+	_, err = w.Write(data)
+	if errutil.HTTPError(req.Context(), w, err) {
+		return
+	}
 }
 
 // IdentityProviderHandler will return a handler for the given provider ID.
@@ -458,7 +461,11 @@ func (h *Handler) handleProvider(id string, p IdentityProvider, refU *url.URL, w
 			errRedirect(err)
 			return
 		}
-		defer tx.Rollback()
+		defer func() {
+			if err := tx.Rollback(); err != nil {
+				log.Log(ctx, err)
+			}
+		}()
 		u := &user.User{
 			Role:  permission.RoleUser,
 			Name:  validate.SanitizeName(sub.Name),

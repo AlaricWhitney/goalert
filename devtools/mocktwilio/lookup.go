@@ -49,5 +49,7 @@ func (s *Server) serveLookup(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
+	if _, err := w.Write(data); err != nil {
+		panic(err)
+	}
 }

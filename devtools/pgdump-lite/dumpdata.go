@@ -10,6 +10,7 @@ import (
 
 	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4"
+	"github.com/target/goalert/util/log"
 )
 
 func sortColumns(columns []string) {
@@ -85,7 +86,11 @@ func DumpData(ctx context.Context, conn *pgx.Conn, out io.Writer, skip []string)
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 
 	tables, err := queryStrings(ctx, tx, "select table_name from information_schema.tables where table_schema = 'public'")
 	if err != nil {
@@ -152,7 +157,9 @@ func DumpData(ctx context.Context, conn *pgx.Conn, out io.Writer, skip []string)
 			}
 			for i, v := range vals {
 				if i > 0 {
-					io.WriteString(out, "\t")
+					if _, err := io.WriteString(out, "\t"); err != nil {
+						log.Log(ctx, err)
+					}
 				}
 				io.WriteString(out, string(*v.(*scannable)))
 			}

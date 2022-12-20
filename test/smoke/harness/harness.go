@@ -385,7 +385,11 @@ func (t testAlert) setStatus(stat alert.Status) {
 		t.h.t.Helper()
 		tx, err := t.h.backend.DB().BeginTx(ctx, nil)
 		require.NoError(t.h.t, err, "begin tx")
-		defer tx.Rollback()
+		defer func() {
+			if err := tx.Rollback(); err != nil {
+				log.Log(ctx, err)
+			}
+		}()
 
 		t.a.Status = stat
 
@@ -422,7 +426,11 @@ func (h *Harness) CreateAlertWithDetails(serviceID, summary, details string) Tes
 		if err != nil {
 			h.t.Fatalf("failed to start tx: %v", err)
 		}
-		defer tx.Rollback()
+		defer func() {
+			if err := tx.Rollback(); err != nil {
+				log.Log(ctx, err)
+			}
+		}()
 		a := &alert.Alert{
 			ServiceID: serviceID,
 			Summary:   summary,
@@ -487,7 +495,9 @@ func (h *Harness) AddNotificationRule(userID, cmID string, delayMinutes int) {
 func (h *Harness) Trigger() {
 	id := h.backend.Engine.NextCycleID()
 	go h.backend.Engine.Trigger()
-	h.backend.Engine.WaitCycleID(context.Background(), id)
+	if err := h.backend.Engine.WaitCycleID(context.Background(), id); err != nil {
+		h.t.Fatalf("ERROR with Trigger(): %v", err)
+	}
 }
 
 // Escalate will escalate an alert in the database, when 'level' matches.

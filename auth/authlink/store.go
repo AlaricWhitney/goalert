@@ -14,6 +14,7 @@ import (
 	"github.com/target/goalert/keyring"
 	"github.com/target/goalert/permission"
 	"github.com/target/goalert/util"
+	"github.com/target/goalert/util/log"
 	"github.com/target/goalert/validation"
 	"github.com/target/goalert/validation/validate"
 )
@@ -124,7 +125,11 @@ func (s *Store) LinkAccount(ctx context.Context, token string) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 
 	var providerID, subjectID string
 	err = tx.StmtContext(ctx, s.rmLink).QueryRowContext(ctx, tokID).Scan(&providerID, &subjectID)

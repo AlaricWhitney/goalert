@@ -115,7 +115,9 @@ func start() {
 
 	// signal when the process has ended
 	go func() {
-		cmd.Wait()
+		if err := cmd.Wait(); err != nil {
+			log.Println("ERROR:", err)
+		}
 		close(wait)
 	}()
 
@@ -168,7 +170,9 @@ func stopWith(lock bool, sig os.Signal) int {
 	log.Println("stopping", flag.Arg(0))
 	close(stopping)
 
-	cmd.Process.Signal(sig)
+	if err := cmd.Process.Signal(sig); err != nil {
+		log.Println("ERROR:", err)
+	}
 	t := time.NewTimer(startTimeout)
 	defer t.Stop()
 	select {

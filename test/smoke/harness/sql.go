@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/target/goalert/util/log"
 )
 
 func sqlSplitBlock(blockIdx int, data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -112,7 +113,11 @@ func ExecSQLBatch(ctx context.Context, url string, query string) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			log.Log(ctx, err)
+		}
+	}()
 
 	b := &pgx.Batch{}
 	for _, q := range queries {

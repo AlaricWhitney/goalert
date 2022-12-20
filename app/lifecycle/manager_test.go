@@ -2,6 +2,7 @@ package lifecycle
 
 import (
 	"context"
+	"log"
 	"testing"
 	"time"
 )
@@ -13,9 +14,15 @@ func TestManager_PauseingShutdown(t *testing.T) {
 	run := func(ctx context.Context) error { <-ctx.Done(); close(ran); return ctx.Err() }
 	shut := func(ctx context.Context) error { return nil }
 	mgr := NewManager(run, shut)
-	mgr.SetPauseResumer(pr)
+	if err := mgr.SetPauseResumer(pr); err != nil {
+		t.Fatal(err)
+	}
 
-	go mgr.Run(context.Background())
+	go func() {
+		if err := mgr.Run(context.Background()); err != nil {
+			log.Fatal(err) // can't pass t into a co-routine
+		}
+	}()
 
 	var err error
 	errCh := make(chan error)
@@ -67,9 +74,15 @@ func TestManager_PauseShutdown(t *testing.T) {
 	run := func(ctx context.Context) error { <-ctx.Done(); close(ran); return ctx.Err() }
 	shut := func(ctx context.Context) error { return nil }
 	mgr := NewManager(run, shut)
-	mgr.SetPauseResumer(pr)
+	if err := mgr.SetPauseResumer(pr); err != nil {
+		t.Fatal(err)
+	}
 
-	go mgr.Run(context.Background())
+	go func() {
+		if err := mgr.Run(context.Background()); err != nil {
+			log.Fatal(err) // can't pass t into a co-routine
+		}
+	}()
 
 	var err error
 	errCh := make(chan error)
@@ -113,9 +126,15 @@ func TestManager_PauseResume(t *testing.T) {
 	run := func(ctx context.Context) error { <-ctx.Done(); return ctx.Err() }
 	shut := func(ctx context.Context) error { return nil }
 	mgr := NewManager(run, shut)
-	mgr.SetPauseResumer(pr)
+	if err := mgr.SetPauseResumer(pr); err != nil {
+		t.Fatal(err)
+	}
 
-	go mgr.Run(context.Background())
+	go func() {
+		if err := mgr.Run(context.Background()); err != nil {
+			log.Fatal(err) // can't pass t into a co-routine
+		}
+	}()
 
 	var err error
 	errCh := make(chan error)
@@ -154,9 +173,15 @@ func TestManager_PauseingResume(t *testing.T) {
 	run := func(ctx context.Context) error { <-ctx.Done(); close(ran); return ctx.Err() }
 	shut := func(ctx context.Context) error { return nil }
 	mgr := NewManager(run, shut)
-	mgr.SetPauseResumer(pr)
+	if err := mgr.SetPauseResumer(pr); err != nil {
+		t.Fatal(err)
+	}
 
-	go mgr.Run(context.Background())
+	go func() {
+		if err := mgr.Run(context.Background()); err != nil {
+			log.Fatal(err) // can't pass t into a co-routine
+		}
+	}()
 
 	var err error
 	errCh := make(chan error)
