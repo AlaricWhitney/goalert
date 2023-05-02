@@ -22,15 +22,17 @@ export function useAlertMetrics(opts: AlertMetricsOpts): AlertMetricPoint[] {
   return Interval.fromISO(opts.int)
     .splitBy(Duration.fromISO(opts.dur))
     .map((i) => {
-      const date = i.start.toLocaleString({
-        month: 'short',
-        day: 'numeric',
-      })
-      const label = i.start.toLocaleString({
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
+      const date =
+        i.start?.toLocaleString({
+          month: 'short',
+          day: 'numeric',
+        }) ?? ''
+      const label =
+        i.start?.toLocaleString({
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        }) ?? ''
 
       const nextIvl = alerts.findIndex(
         (a) => !i.contains(DateTime.fromISO(a.metrics?.closedAt as string)),

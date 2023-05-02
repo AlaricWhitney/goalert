@@ -51,7 +51,7 @@ function ISOPicker(props: ISOPickerProps): JSX.Element {
   }, [props.value])
 
   const dtToISO = (dt: DateTime): string => {
-    return dt.startOf(truncateTo).setZone(zone).toISO()
+    return dt.startOf(truncateTo).setZone(zone).toISO() ?? ''
   }
 
   // parseInputToISO takes input from the form control and returns a string

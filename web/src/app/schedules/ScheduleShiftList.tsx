@@ -88,12 +88,12 @@ function ScheduleShiftList({
   const [activeOnly, setActiveOnly] = useURLParam<boolean>('activeOnly', false)
 
   const defaultStart = useMemo(
-    () => DateTime.local({ zone }).startOf('day').toISO(),
+    () => DateTime.local({ zone }).startOf('day').toISO() ?? '',
     [zone],
   )
   const [_start, setStart] = useURLParam('start', defaultStart)
   const start = useMemo(
-    () => (activeOnly ? DateTime.utc().toISO() : _start),
+    () => (activeOnly ? DateTime.utc().toISO() ?? '' : _start),
     [activeOnly, _start],
   )
 
@@ -140,10 +140,10 @@ function ScheduleShiftList({
     let shiftDetails = ''
     const startTime = s.start.toLocaleString(locale)
     const endTime = s.end.toLocaleString(locale)
-    const localStartTime = DateTime.fromISO(s.start.toISO(), {
+    const localStartTime = DateTime.fromISO(s.start.toISO() ?? '', {
       zone: 'local',
     }).toLocaleString(locale)
-    const localEndTime = DateTime.fromISO(s.end.toISO(), {
+    const localEndTime = DateTime.fromISO(s.end.toISO() ?? '', {
       zone: 'local',
     }).toLocaleString(locale)
 
@@ -226,7 +226,7 @@ function ScheduleShiftList({
 
     const displaySpan = Interval.fromDateTimes(
       DateTime.fromISO(start, { zone }).startOf('day'),
-      DateTime.fromISO(end, { zone }).startOf('day'),
+      DateTime.fromISO(end ?? '', { zone }).startOf('day'),
     )
 
     const result: FlatListListItem[] = []
@@ -234,7 +234,7 @@ function ScheduleShiftList({
       const dayShifts = shifts.filter((s) => day.overlaps(s.interval))
       if (!dayShifts.length) return
       result.push({
-        subHeader: relativeDate(day.start),
+        subHeader: relativeDate(day.start ?? ''),
       })
       dayShifts.forEach((s) => {
         result.push({
@@ -295,7 +295,7 @@ function ScheduleShiftList({
           setDuration(
             Duration.fromObject({
               days: clamp(1, 30, parseInt(e.target.value, 10)),
-            }).toISO(),
+            }).toISO() ?? '',
           )
         }}
       />

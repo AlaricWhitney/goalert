@@ -34,7 +34,7 @@ export default function AdminAlertCounts(): JSX.Element {
   const now = useMemo(() => DateTime.now(), [])
 
   const [params] = useURLParams({
-    createdAfter: now.minus({ days: 1 }).toISO(),
+    createdAfter: now.minus({ days: 1 }).toISO() ?? '',
     createdBefore: '',
     interval: 'PT1H',
   })
@@ -60,7 +60,11 @@ export default function AdminAlertCounts(): JSX.Element {
   const alertsData = useAlerts(alertOptions, depKey)
 
   const alertCountOpts: AlertCountOpts = useMemo(
-    () => ({ int: graphInterval, dur: graphDur, alerts: alertsData.alerts }),
+    () => ({
+      int: graphInterval,
+      dur: graphDur ? graphDur : '',
+      alerts: alertsData.alerts,
+    }),
     [graphInterval, graphDur, alertsData.alerts],
   )
   const [alertCounts, alertCountStatus] = useWorker(

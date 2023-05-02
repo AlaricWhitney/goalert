@@ -35,7 +35,7 @@ export default function AlertMetrics({
   })
   const [range] = useURLParam('range', 'P1M')
   const [ivl] = useURLParam('interval', 'P1D')
-  const graphDur = Duration.fromISO(ivl).toISO()
+  const graphDur = Duration.fromISO(ivl).toISO() ?? ''
 
   const unit = units[ivl]
   const since = now.minus(Duration.fromISO(range)).startOf(unit)

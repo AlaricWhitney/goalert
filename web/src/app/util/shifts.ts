@@ -27,8 +27,8 @@ export function trimSpans<T extends SpanISO>(
 
       return ivl.difference(...intervals).map((ivl) => ({
         ...s,
-        start: ivl.start.toISO(),
-        end: ivl.end.toISO(),
+        start: ivl.start?.toISO() ?? '',
+        end: ivl.end?.toISO() ?? '',
       }))
     }),
   )

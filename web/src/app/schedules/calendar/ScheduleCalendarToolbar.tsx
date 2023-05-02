@@ -73,13 +73,16 @@ function ScheduleCalendarToolbar(
 
     // if viewing the current month, show the current week
     if (nextView === 'week' && prevStartMonth === currMonth) {
-      setNavParams({ weekly: true, start: getStartOfWeek().toISODate() })
+      setNavParams({
+        weekly: true,
+        start: getStartOfWeek().toISODate() ?? undefined,
+      })
 
       // if not on the current month, show the first week of the month
     } else if (nextView === 'week' && prevStartMonth !== currMonth) {
       setNavParams({
         weekly: true,
-        start: DateTime.fromISO(start).startOf('month').toISODate(),
+        start: DateTime.fromISO(start).startOf('month').toISODate() ?? undefined,
       })
 
       // go from week to monthly view
@@ -90,16 +93,16 @@ function ScheduleCalendarToolbar(
         weekly: false,
         start: getEndOfWeek(DateTime.fromISO(start))
           .startOf('month')
-          .toISODate(),
+          .toISODate() || undefined,
       })
     }
   }
 
   const onNavigate = (next: DateTime): void => {
     if (weekly) {
-      setNavParams({ start: getStartOfWeek(next).toISODate() })
+      setNavParams({ start: getStartOfWeek(next).toISODate() ?? undefined })
     } else {
-      setNavParams({ start: next.startOf('month').toISODate() })
+      setNavParams({ start: next.startOf('month').toISODate() ?? undefined })
     }
   }
 

@@ -31,30 +31,32 @@ export function useAdminAlertCounts(opts: AlertCountOpts): AlertCountSeries[] {
     Interval.fromISO(opts.int)
       .splitBy(Duration.fromISO(opts.dur))
       .map((i) => {
-        const date = i.start.toLocaleString({
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: 'numeric',
-        })
-        const label = i.start.toLocaleString({
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-          hour: 'numeric',
-          minute: 'numeric',
-        })
+        if (i.start) {
+          const date = i.start.toLocaleString({
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+          })
+          const label = i.start.toLocaleString({
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+          })
 
-        const bucket = alerts.filter((a) => {
-          return i.contains(DateTime.fromISO(a.createdAt as string))
-        })
-        alertCounts.push({
-          date,
-          label,
-          dayTotal: bucket.length,
-        })
-        svcTotal += bucket.length
-        if (bucket.length > svcMax) svcMax = bucket.length
+          const bucket = alerts.filter((a) => {
+            return i.contains(DateTime.fromISO(a.createdAt as string))
+          })
+          alertCounts.push({
+            date,
+            label,
+            dayTotal: bucket.length,
+          })
+          svcTotal += bucket.length
+          if (bucket.length > svcMax) svcMax = bucket.length
+        }
       })
     return {
       serviceName: alerts[0].service?.name as string,

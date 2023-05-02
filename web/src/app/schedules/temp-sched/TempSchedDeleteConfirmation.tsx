@@ -32,10 +32,8 @@ export default function TempSchedDeleteConfirmation({
     },
   })
 
-  const start = DateTime.max(
-    DateTime.fromISO(value.start),
-    DateTime.utc(),
-  ).toISO()
+  const start =
+    DateTime.max(DateTime.fromISO(value.start), DateTime.utc()).toISO() ?? ''
 
   return (
     <FormDialog

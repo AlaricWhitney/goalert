@@ -27,7 +27,10 @@ const RotationCreateDialog = (props: { onClose?: () => void }): JSX.Element => {
     description: '',
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     type: 'daily',
-    start: DateTime.local().plus({ hours: 1 }).startOf('hour').toISO(),
+    start: DateTime.local()
+      .plus({ hours: 1 })
+      .startOf('hour')
+      .toISO() ?? '',
     shiftLength: 1,
     favorite: true,
   })

@@ -78,7 +78,7 @@ const clampForward = (nowISO: string, iso: string | undefined): string => {
   const now = DateTime.fromISO(nowISO)
   const dt = DateTime.fromISO(iso)
   if (dt < now) {
-    return now.toISO()
+    return now.toISO() ?? ''
   }
   return iso
 }
@@ -91,7 +91,7 @@ export default function TempSchedDialog({
   const classes = useStyles()
   const edit = !_.isEmpty(_value)
   const { q, zone, isLocalZone } = useScheduleTZ(scheduleID)
-  const [now] = useState(DateTime.utc().startOf('minute').toISO())
+  const [now] = useState(DateTime.utc().startOf('minute').toISO() ?? '')
   const [showForm, setShowForm] = useState(false)
   const [value, setValue] = useState({
     start: clampForward(now, _value?.start),
@@ -121,8 +121,8 @@ export default function TempSchedDialog({
       const nextFriday = nextMonday.plus({ days: 5 }) // thru to the end of Friday
       setValue({
         ...value,
-        start: nextMonday.toISO(),
-        end: nextFriday.toISO(),
+        start: nextMonday.toISO() ?? '',
+        end: nextFriday.toISO() ?? '',
       })
     }
   }, [q.loading, zone])
@@ -161,13 +161,13 @@ export default function TempSchedDialog({
     const endDT = DateTime.fromISO(shift?.end ?? '', { zone })
     const duration = dtToDuration(startDT, endDT)
     const nextStart = coverageGap?.start
-    const nextEnd = nextStart.plus({ hours: duration })
+    const nextEnd = nextStart?.plus({ hours: duration })
 
     setShift({
       userID: shift?.userID ?? '',
       truncated: !!shift?.truncated,
-      start: nextStart.toISO(),
-      end: nextEnd.toISO(),
+      start: nextStart?.toISO() ?? '',
+      end: nextEnd?.toISO() ?? '',
     })
   }
 

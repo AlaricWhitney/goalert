@@ -17,7 +17,7 @@ import { DateTime } from 'luxon'
 export default function AlertCountControls(): JSX.Element {
   const now = useMemo(() => DateTime.now(), [])
   const [params, setParams] = useURLParams({
-    createdAfter: now.minus({ days: 1 }).toISO(),
+    createdAfter: now.minus({ days: 1 }).toISO() ?? '',
     createdBefore: '',
     interval: 'PT1H',
   })

@@ -64,8 +64,8 @@ export default function ScheduleOverrideCreateDialog({
   const [value, setValue] = useState({
     addUserID: '',
     removeUserID: '',
-    start: DateTime.local().startOf('hour').toISO(),
-    end: DateTime.local().startOf('hour').plus({ hours: 8 }).toISO(),
+    start: DateTime.local().startOf('hour').toISO() ?? '',
+    end: DateTime.local().startOf('hour').plus({ hours: 8 }).toISO() ?? '',
   })
 
   const notices = useOverrideNotices(scheduleID, value)

@@ -23,7 +23,10 @@ const TimeTimestamp: React.FC<TimeTimestampProps> = (props) => {
   const [, setTS] = useState('') // force re-render
   useEffect(() => {
     if (!['relative', 'relative-date'].includes(props.format || '')) return
-    const interval = setInterval(() => setTS(DateTime.utc().toISO()), 1000)
+    const interval = setInterval(
+      () => setTS(DateTime.utc().toISO() ?? ''),
+      1000,
+    )
     return () => clearInterval(interval)
   }, [props.format])
 
@@ -54,7 +57,7 @@ const TimeTimestamp: React.FC<TimeTimestampProps> = (props) => {
     <React.Fragment>
       {prefix}
       <time
-        dateTime={time.toISO()}
+        dateTime={time.toISO() ?? undefined}
         title={display !== local ? title : undefined}
         style={{
           textDecorationStyle: 'dotted',
@@ -87,7 +90,7 @@ const TimeDuration: React.FC<TimeDurationProps> = (props) => {
   return (
     <React.Fragment>
       {props.prefix}
-      <time dateTime={dur.toISO()}>
+      <time dateTime={dur.toISO() ?? undefined}>
         {formatRelative({
           dur,
           noQualifier: true,

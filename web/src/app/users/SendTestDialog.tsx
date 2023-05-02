@@ -77,7 +77,7 @@ export default function SendTestDialog(
   }, [lastTestVerifyAt, fetching])
 
   let details = ''
-  if (sendTestStatus.data && lastTestVerifyAt > now.toISO()) {
+  if (sendTestStatus.data && lastTestVerifyAt > (now.toISO() ?? '')) {
     details = data?.userContactMethod?.lastTestMessageState?.details ?? ''
   }
 

@@ -35,12 +35,12 @@ export function useAlertCSV({ urlPrefix, alerts }: useAlertCSVOpts): string {
       [
         DateTime.fromISO(a.createdAt).toLocal().toSQL({
           includeOffset: false,
-        }),
+        }) ?? '',
         DateTime.fromISO(a.metrics?.closedAt as string)
           .toLocal()
           .toSQL({
             includeOffset: false,
-          }),
+          }) ?? '',
         Duration.fromISO(a.metrics?.timeToAck as string).toFormat('hh:mm:ss'),
         Duration.fromISO(a.metrics?.timeToClose as string).toFormat('hh:mm:ss'),
         a.alertID.toString(),

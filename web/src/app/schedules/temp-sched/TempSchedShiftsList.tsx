@@ -119,11 +119,11 @@ export default function TempSchedShiftsList({
 
         return dayInvs.map((inv, index) => {
           const startTime = fmtTime(
-            s.displayStart ? s.displayStart : inv.start,
+            s.displayStart ? s.displayStart : inv.start ?? '',
             zone,
             false,
           )
-          const endTime = fmtTime(inv.end, zone, false)
+          const endTime = fmtTime(inv.end ?? '', zone, false)
           const shiftExists = existingShifts.find((shift) => {
             return (
               DateTime.fromISO(s.start).equals(DateTime.fromISO(shift.start)) &&
@@ -143,16 +143,18 @@ export default function TempSchedShiftsList({
           } else if (inv.engulfs(shiftInv)) {
             // shift is inside the day
             subText = `From ${startTime} to ${endTime}`
-            titleText = `From ${fmtLocal(inv.start.toISO())} to ${fmtLocal(
-              inv.end.toISO(),
-            )}`
+            titleText = `From ${fmtLocal(
+              inv.start?.toISO() ?? '',
+            )} to ${fmtLocal(inv.end?.toISO() ?? '')}`
           } else if (inv.end === shiftInv.end) {
             subText = `Active until ${endTime}`
-            titleText = `Active until ${fmtLocal(inv.end.toISO())}`
+            titleText = `Active until ${fmtLocal(inv.end?.toISO() ?? '')}`
           } else {
             // shift starts and continues on for the rest of the day
             subText = `Active starting at ${startTime}\n`
-            titleText = `Active starting at ${fmtLocal(inv.start.toISO())}`
+            titleText = `Active starting at ${fmtLocal(
+              inv.start?.toISO() ?? '',
+            )}`
           }
 
           return {

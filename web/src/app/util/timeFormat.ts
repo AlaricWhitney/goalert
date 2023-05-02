@@ -56,7 +56,7 @@ export function relativeDate(
 ): string {
   const to = _to instanceof DateTime ? _to : DateTime.fromISO(_to)
   const from = (_from instanceof DateTime ? _from : DateTime.fromISO(_from))
-    .setZone(to.zoneName)
+    .setZone(to.zoneName ?? undefined)
     .startOf('day')
 
   const fmt: DateTimeFormatOptions = {

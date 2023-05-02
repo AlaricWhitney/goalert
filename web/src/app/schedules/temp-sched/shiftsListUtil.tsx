@@ -38,12 +38,12 @@ export function getSubheaderItems(
 
   // get earliest and farthest out start/end times
   const lowerBound = DateTime.min(
-    schedInterval.start,
+    schedInterval.start as DateTime,
     ...shifts.map((s) => DateTime.fromISO(s.start, { zone })),
   )
 
   const upperBound = DateTime.max(
-    schedInterval.end,
+    schedInterval.end as DateTime,
     ...shifts.map((s) => DateTime.fromISO(s.end, { zone })),
   )
 
@@ -52,10 +52,10 @@ export function getSubheaderItems(
   )
 
   return dayInvs.map((day) => {
-    const at = day.start.startOf('day')
+    const at = (day.start as DateTime).startOf('day')
     return {
       id: 'header_' + at.toISO(),
-      subHeader: day.start.toFormat('cccc, LLLL d'),
+      subHeader: (day.start as DateTime).toFormat('cccc, LLLL d'),
       at,
       itemType: 'subheader',
     }
@@ -73,22 +73,22 @@ export function getOutOfBoundsItems(
 
   // get earliest and farthest out start/end times
   const lowerBound = DateTime.min(
-    schedInterval.start,
+    schedInterval.start as DateTime,
     ...shifts.map((s) => DateTime.fromISO(s.start, { zone })),
   )
 
   const upperBound = DateTime.max(
-    schedInterval.end,
+    schedInterval.end as DateTime,
     ...shifts.map((s) => DateTime.fromISO(s.end, { zone })),
   )
 
   const beforeStart = Interval.fromDateTimes(
     lowerBound,
-    schedInterval.start,
+    schedInterval.start as DateTime,
   ).mapEndpoints((e) => e.startOf('day')) // ensure sched start date is not included
 
   const afterEnd = Interval.fromDateTimes(
-    schedInterval.end,
+    schedInterval.end as DateTime,
     upperBound,
   ).mapEndpoints((e) => e.plus({ day: 1 }).startOf('day')) // ensure sched end date is not included
 
@@ -98,18 +98,20 @@ export function getOutOfBoundsItems(
 
   let details = ''
   return intervals.map((interval) => {
-    if (interval.end <= schedInterval.start) {
+    if ((interval.end as DateTime) <= (schedInterval.start as DateTime)) {
       details = 'This day is before the set start date.'
-    } else if (interval.start >= schedInterval.end) {
+    } else if (
+      (interval.start as DateTime) >= (schedInterval.end as DateTime)
+    ) {
       details = 'This day is after the set end date.'
     }
 
     return {
-      id: 'day-out-of-bounds_' + interval.start.toISO(),
+      id: 'day-out-of-bounds_' + (interval.start as DateTime).toISO(),
       type: 'INFO',
       message: '',
       details,
-      at: interval.start.startOf('day'),
+      at: (interval.start as DateTime).startOf('day'),
       itemType: 'outOfBounds',
     }
   })
@@ -133,27 +135,29 @@ export function getCoverageGapItems(
   return gapIntervals.map((gap) => {
     let details = 'No coverage'
     let title = 'No coverage'
-    if (gap.length('hours') === 24) {
-      // nothing to do
-      title = ''
-    } else if (gap.start.equals(gap.start.startOf('day'))) {
-      details += ` until ${fmtTime(gap.end, zone, false)}`
-      title += ` until ${fmtLocal(gap.end)}`
-    } else if (gap.end.equals(gap.start.plus({ day: 1 }).startOf('day'))) {
-      details += ` after ${fmtTime(gap.start, zone, false)}`
-      title += ` after ${fmtLocal(gap.start)}`
-    } else {
-      details += ` from ${fmtTime(gap.start, zone, false)} to ${fmtTime(
-        gap.end,
-        zone,
-        false,
-      )}`
-      title += ` from ${fmtLocal(gap.start)} to ${fmtLocal(gap.end)}`
+    if (gap.start && gap.end) {
+      if (gap.length('hours') === 24) {
+        // nothing to do
+        title = ''
+      } else if (gap.start.equals(gap.start.startOf('day'))) {
+        details += ` until ${fmtTime(gap.end, zone, false)}`
+        title += ` until ${fmtLocal(gap.end)}`
+      } else if (gap.end.equals(gap.start.plus({ day: 1 }).startOf('day'))) {
+        details += ` after ${fmtTime(gap.start, zone, false)}`
+        title += ` after ${fmtLocal(gap.start)}`
+      } else {
+        details += ` from ${fmtTime(gap.start, zone, false)} to ${fmtTime(
+          gap.end,
+          zone,
+          false,
+        )}`
+        title += ` from ${fmtLocal(gap.start)} to ${fmtLocal(gap.end)}`
+      }
     }
 
     return {
       'data-cy': 'day-no-coverage',
-      id: 'day-no-coverage_' + gap.start.toISO(),
+      id: 'day-no-coverage_' + (gap.start as DateTime).toISO(),
       type: 'WARNING',
       message: '',
       details: (
@@ -161,7 +165,7 @@ export function getCoverageGapItems(
           <span>{details}</span>
         </Tooltip>
       ),
-      at: gap.start,
+      at: gap.start as DateTime,
       itemType: 'gap',
       handleOnClick: () => {
         handleCoverageClick(gap)

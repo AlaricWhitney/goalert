@@ -61,9 +61,11 @@ export function splitAtMidnight(inv: Interval): Interval[] {
 
   const midnights: DateTime[] = []
   let iter = dummy.start
-  while (iter < dummy.end) {
-    midnights.push(iter.startOf('day'))
-    iter = iter.plus({ day: 1 })
+  if (iter && dummy.end) {
+    while (iter < dummy.end) {
+      midnights.push(iter.startOf('day'))
+      iter = iter.plus({ day: 1 })
+    }
   }
 
   return inv.splitAt(...midnights)

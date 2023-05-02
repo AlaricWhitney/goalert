@@ -15,8 +15,8 @@ export function useCalendarNavigation(): CalendarNavigation {
   const [params, setParams] = useURLParams({
     weekly: false as boolean,
     start: _params.weekly
-      ? getStartOfWeek().toISODate()
-      : DateTime.now().startOf('month').toISODate(),
+      ? getStartOfWeek().toISODate() ?? ''
+      : DateTime.now().startOf('month').toISODate() ?? '',
   })
 
   return {
